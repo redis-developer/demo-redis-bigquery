@@ -1,24 +1,14 @@
 import Result from "../components/Result.jsx";
-import { useEffect } from "react";
-import "../css/Bookmarks.css";
+import "../css/Race.css";
 import { useParams } from "react-router-dom";
-import { actions, hooks } from "../services/races.js";
+import { hooks } from "../services/races.js";
 import { hooks as notifications } from "../services/notifications.js";
 import Progress from "../components/Progress.jsx";
 
-function RaceData() {
+function Race() {
   const { raceId } = useParams();
   const timerRunning = notifications.useTimerRunning();
-  const race = hooks.useRace({ invokeAction: false });
-
-  async function getRace(id) {
-    await actions.one(id);
-  }
-
-  //Load Race data on page load
-  useEffect(() => {
-    getRace(raceId);
-  }, [raceId]);
+  const race = hooks.useRace({ actionArgs: [raceId] });
 
   return (
     <div className="home">
@@ -54,4 +44,4 @@ function RaceData() {
   );
 }
 
-export default RaceData;
+export default Race;

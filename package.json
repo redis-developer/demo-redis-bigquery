@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "bun runner.js",
+    "dev": "run-p dev:*",
     "dev:client": "bunx --bun vite",
     "dev:server": "bun --watch server/index.js",
     "format": "prettier . --write",
@@ -27,14 +27,11 @@
     "redis": "^4.7.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.23.0",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.1",
-    "eslint": "^9.23.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.5.3",
     "vite": "^6.2.3"
   }

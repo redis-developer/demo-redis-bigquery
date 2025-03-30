@@ -25,7 +25,6 @@ export const actions = {
   },
 
   loadTime(time) {
-    console.log(time);
     state.loadTime = time;
   },
 

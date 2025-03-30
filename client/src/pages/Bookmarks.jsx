@@ -1,6 +1,6 @@
 import "../css/Bookmarks.css";
 import { useBookmarkContext } from "../context/BookmarkContext";
-import Race from "../components/Race";
+import Race from "../components/Race.jsx";
 
 function Bookmarks() {
   const { bookmarks } = useBookmarkContext();

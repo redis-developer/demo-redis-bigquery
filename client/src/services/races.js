@@ -1,7 +1,7 @@
 import * as tates from "tates";
 
 import { actions as notifications } from "./notifications";
-import { createStateHook } from "react-tates";
+import { createKeyedStateHook, createStateHook } from "react-tates";
 
 /**
  * @typedef {Object} RaceResult
