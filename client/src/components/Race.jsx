@@ -13,7 +13,7 @@ function Race({ race }) {
     else addToBookmarks(race);
   }
 
-  function onCardClick(e) {
+  function onCardClick() {
     changeRace(race.race_id);
   }
 
