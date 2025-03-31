@@ -35,6 +35,7 @@ FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/build/server/ server/
 COPY --from=prerelease /usr/src/app/build/client client/
+COPY --from=prerelease /usr/src/app/assets/ assets/
 COPY --from=prerelease /usr/src/app/package.json .
 
 # run the app
