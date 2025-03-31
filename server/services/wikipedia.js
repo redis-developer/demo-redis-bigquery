@@ -3,20 +3,27 @@ import path from "path";
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-const jsonPath = path.resolve("assets/circuit_images.json");
+const circuitsFilePath = path.resolve("assets/circuit_images.json");
+const driversFilePath = path.resolve("assets/driver_images.json");
 const query =
   "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=";
 const titleRegex = /[^\/]*$/g;
 
-export async function findImageUrl(url) {
+export async function findImageUrl(url, type) {
+  if (typeof url !== "string") {
+    return;
+  }
+
   try {
-    if (typeof url !== "string") {
-      return;
+    let existingImage;
+
+    if (type === "circuit") {
+      existingImage = await findCircuitImageFromFile(url);
+    } else if (type === "driver") {
+      existingImage = await findDriverImageFromFile(url);
     }
 
-    const existingImage = await findImageFromFile(url);
-
-    if (existingImage) {
+    if (typeof existingImage === "string") {
       return existingImage;
     }
 
@@ -46,27 +53,40 @@ export async function findImageUrl(url) {
     const pages = data.query.pages;
 
     for (let article of Object.values(pages)) {
-      if (typeof article.original.source === "string") {
-        await saveImage(url, article.original.source);
+      if (typeof article.original?.source === "string") {
+        if (type === "circuit") {
+          await saveCircuitImage(url, article.original.source);
+        } else if (type === "driver") {
+          await saveDriverImage(url, article.original.source);
+        }
         return article.original.source;
+      } else {
+        if (type === "circuit") {
+          await saveCircuitImage(url, "");
+        } else if (type === "driver") {
+          await saveDriverImage(url, "");
+        }
+
+        console.log(`No image found for: ${url}`);
       }
     }
   } catch (e) {
+    console.log(`Error getting image for: ${url}`);
     console.log(e);
   }
 }
 
 /**
- * Reads or creates the circuits file and returns the data
+ * Reads or creates the file and returns the data
  */
-async function readCircuitsFile() {
+async function readFile(filePath) {
   try {
-    await fs.access(jsonPath);
+    await fs.access(filePath);
   } catch (e) {
-    await fs.writeFile(jsonPath, "{}");
+    await fs.writeFile(filePath, "{}");
   }
 
-  const file = await fs.readFile(jsonPath);
+  const file = await fs.readFile(filePath);
 
   return JSON.parse(file);
 }
@@ -77,8 +97,8 @@ async function readCircuitsFile() {
  * @param {string} url
  * @returns {Promise<string | undefined>}
  */
-async function findImageFromFile(url) {
-  const data = await readCircuitsFile();
+async function findCircuitImageFromFile(url) {
+  const data = await readFile(circuitsFilePath);
 
   return data[url];
 }
@@ -88,9 +108,32 @@ async function findImageFromFile(url) {
  * @param {string} url The circuit wikipedia url
  * @param {string} imageUrl The circuit image url
  */
-async function saveImage(url, imageUrl) {
-  const data = await readCircuitsFile();
+async function saveCircuitImage(url, imageUrl) {
+  const data = await readFile(circuitsFilePath);
   data[url] = imageUrl;
 
-  await fs.writeFile(jsonPath, JSON.stringify(data, null, 2));
+  await fs.writeFile(circuitsFilePath, JSON.stringify(data, null, 2));
+}
+
+/** Finds images in the drivers file for a given url
+ *
+ * @param {string} url
+ * @returns {Promise<string | undefined>}
+ */
+async function findDriverImageFromFile(url) {
+  const data = await readFile(driversFilePath);
+
+  return data[url];
+}
+
+/**
+ * Saves drivers images to a file
+ * @param {string} url The driver wikipedia url
+ * @param {string} imageUrl The driver image url
+ */
+async function saveDriverImage(url, imageUrl) {
+  const data = await readFile(driversFilePath);
+  data[url] = imageUrl;
+
+  await fs.writeFile(driversFilePath, JSON.stringify(data, null, 2));
 }

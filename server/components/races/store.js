@@ -170,13 +170,13 @@ export async function populate() {
   const [results] = /** @type [RaceResult[]] */ (
     await bq.query(QUERIES.RESULTS)
   );
-  const urls = {};
+  const circuitsUrls = {};
 
   for (let race of races) {
-    let imageUrls = urls[race.circuit_url];
+    let imageUrls = circuitsUrls[race.circuit_url];
 
     if (!Array.isArray(imageUrls)) {
-      imageUrls = urls[race.circuit_url] = [];
+      imageUrls = circuitsUrls[race.circuit_url] = [];
     }
 
     imageUrls.push(race);
@@ -185,10 +185,15 @@ export async function populate() {
     race.winner = race.results.find((result) => result.position === 1);
   }
 
-  for (let circuitUrl of Object.keys(urls)) {
-    let image = await findImageUrl(circuitUrl);
-    for (let race of urls[circuitUrl]) {
-      race.circuit_image = image;
+  for (let result of results) {
+    let image = await findImageUrl(result.driver_url, "driver");
+    result.driver_image = image ?? "";
+  }
+
+  for (let circuitUrl of Object.keys(circuitsUrls)) {
+    let image = await findImageUrl(circuitUrl, "circuit");
+    for (let race of circuitsUrls[circuitUrl]) {
+      race.circuit_image = image ?? "";
     }
   }
 

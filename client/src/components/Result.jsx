@@ -1,15 +1,16 @@
 import "../css/Race.css";
-import { useBookmarkContext } from "../context/BookmarkContext";
 import { Link } from "react-router-dom";
-import logo from "../img/F1.jpg";
 
 function Result({ result }) {
   return (
     <Link to={result.driver_url} target="_blank">
       <div className="race">
-        {/* <div className="driver-img">
-        <img src={logo} alt={driver.surname}/>
-        </div> */}
+        <div className="driver-img">
+          <img
+            src={result.driver_image}
+            alt={`${result.driver_forename} ${result.driver_surname}`}
+          />
+        </div>
         <div className="race-info">
           <h3>
             {result.driver_forename} {result.driver_surname}
