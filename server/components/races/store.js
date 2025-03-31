@@ -1,6 +1,7 @@
 import { BigQuery } from "@google-cloud/bigquery";
 import { getClient } from "../../redis";
 import { SchemaFieldTypes } from "redis";
+import { findImageUrl } from "../../services/wikipedia";
 
 /**
  * @typedef {Object} RaceResult
@@ -29,7 +30,7 @@ import { SchemaFieldTypes } from "redis";
  * @property {string} circuit_location
  * @property {string} circuit_country
  * @property {string} circuit_url
- * @property {string} circuit_map
+ * @property {string} circuit_image
  * @property {RaceResult[]} results
  * @property {RaceResult} winner
  *
@@ -62,13 +63,12 @@ const QUERIES = {
   c.location AS circuit_location,
   c.country AS circuit_country,
   c.url AS circuit_url,
-  c.googlemap AS circuit_map,
 FROM
   f1.races r
 JOIN
   f1.circuits c
 ON c.circuitId = r.circuitId
-ORDER BY r.raceId ASC`,
+ORDER BY r.date desc`,
   RESULTS: `SELECT
   re.resultId AS result_id,
   re.raceId AS race_id,
@@ -170,10 +170,26 @@ export async function populate() {
   const [results] = /** @type [RaceResult[]] */ (
     await bq.query(QUERIES.RESULTS)
   );
+  const urls = {};
 
   for (let race of races) {
+    let imageUrls = urls[race.circuit_url];
+
+    if (!Array.isArray(imageUrls)) {
+      imageUrls = urls[race.circuit_url] = [];
+    }
+
+    imageUrls.push(race);
+
     race.results = results.filter((result) => result.race_id === race.race_id);
     race.winner = race.results.find((result) => result.position === 1);
+  }
+
+  for (let circuitUrl of Object.keys(urls)) {
+    let image = await findImageUrl(circuitUrl);
+    for (let race of urls[circuitUrl]) {
+      race.circuit_image = image;
+    }
   }
 
   await redis.json.mSet(

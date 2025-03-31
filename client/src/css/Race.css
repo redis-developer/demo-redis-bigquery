@@ -28,6 +28,7 @@ input:invalid {
 
 .race-img {
   position: relative;
+  background-color: #163341;
   /* aspect-ratio: 3/4; */
   width: 100%;
   height: 70%;

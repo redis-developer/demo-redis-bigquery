@@ -1,0 +1,39 @@
+dialog[open] {
+  position: absolute;
+  height: 65%;
+  width: 65%;
+  margin: auto;
+  padding: 2rem;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  z-index: 999;
+
+  display: flex;
+
+  > div {
+    padding: 0rem 2rem;
+  }
+
+  pre {
+    padding: 1rem;
+  }
+
+  button {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    padding: 0.5rem 1rem;
+    color: #fff;
+    border: 1px solid #dcff1e;
+    border-radius: 2px;
+  }
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+}

@@ -21,7 +21,7 @@ function Race({ race }) {
     <Link to={`/races/${race.race_id}`}>
       <div className="race" onClick={onCardClick}>
         <div className="race-img">
-          <img src={race.circuit_map} alt={race.name} />
+          <img src={race.circuit_image} alt={race.name} />
           <div className="race-overlay">
             <button
               className={`bookmark-btn ${bookmark ? "active" : ""}`}
