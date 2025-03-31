@@ -130,7 +130,9 @@ export const actions = {
     await actions.one(state.raceId);
     await actions.count();
 
-    notifications.loadTime(ms);
+    setTimeout(() => {
+      notifications.loadTime(ms);
+    }, 200);
   },
 };
 
