@@ -1,8 +1,17 @@
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 1.5rem;
   box-sizing: border-box;
   width: 100%;
+  max-width: 86.875rem;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 78.75rem) and (max-width: 100rem) {
+  .main-content {
+    max-width: 80rem;
+    padding: 1.5rem 5rem;
+  }
 }

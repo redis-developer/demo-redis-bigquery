@@ -1,39 +1,68 @@
 dialog[open] {
-  position: absolute;
-  height: 65%;
-  width: 65%;
+  position: fixed;
+  max-height: 80vh;
+  width: min(90vw, 48rem);
   margin: auto;
   padding: 2rem;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--fg-body);
+  background-color: var(--bg-default);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   z-index: 999;
 
   display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   > div {
-    padding: 0rem 2rem;
+    min-width: 0;
   }
 
   pre {
     padding: 1rem;
+    font-family: var(--secondary-font);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    background-color: var(--dusk-09);
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  code {
+    font-family: var(--secondary-font);
+  }
+
+  h2 {
+    color: var(--fg-default);
+    margin-bottom: 0.5rem;
   }
 
   button {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.5rem;
+    right: 0.5rem;
 
     padding: 0.5rem 1rem;
-    color: #fff;
-    border: 1px solid #dcff1e;
-    border-radius: 2px;
+    color: var(--base-white);
+    background-color: var(--dusk);
+    border: 1px solid var(--dusk-90);
+    border-radius: 5px;
+  }
+
+  button:hover {
+    background-color: var(--dusk-90);
   }
 
   &::backdrop {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
   }
 }

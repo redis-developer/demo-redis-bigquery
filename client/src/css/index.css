@@ -1,14 +1,73 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
 
 :root {
-  font-family:
-    "Space Grotesk", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --primary-font: "Space Grotesk", sans-serif;
+  --secondary-font: "Space Mono", monospace;
+
+  /* Brand Core */
+  --primary-color: #ff4438;
+  --midnight: #091a23;
+  --yellow: #dcff1e;
+  --base-white: #ffffff;
+  --base-black: #000000;
+
+  /* Hyper (Red) Scale */
+  --hyper-04: #fd736a;
+  --hyper-05: #ff4438;
+  --hyper-06: #eb352a;
+  --hyper-07: #e4291e;
+  --hyper-08: #d1281e;
+  --hyper-09: #8a221c;
+  --hyper-10: #351d22;
+
+  /* Neutrals (Black) */
+  --black-90: #191919;
+  --black-70: #4c4c4c;
+  --black-60: #6d6e71;
+  --black-50: #808080;
+  --black-30: #b2b2b2;
+  --black-10: #e5e5e5;
+
+  /* Neutrals (Grey) */
+  --grey-50: #f9fafb;
+  --grey-20: #e9e9e9;
+  --grey-10: #fcfcfc;
+  --light-gray: #f8f8f8;
+
+  /* Dusk (Blue-Grey) Scale */
+  --dusk: #163341;
+  --dusk-01: #f3f3f3;
+  --dusk-09: #0d212c;
+  --dusk-90: #2d4754;
+  --dusk-50: #8a99a0;
+  --dusk-30: #b9c2c6;
+  --dusk-10: #d9d9d9;
+
+  /* Yellow / Volt Scale */
+  --yellow-06: #d0f41d;
+  --yellow-07: #bfe112;
+  --yellow-08: #a9ca03;
+  --yellow-09: #8caa00;
+  --yellow-11: #4e5f02;
+  --yellow-50: #f1ffa5;
+  --yellow-10: #fbffe8;
+
+  /* Dark Theme Semantic Tokens */
+  --bg-default: var(--midnight);
+  --fg-default: var(--base-white);
+  --fg-body: var(--dusk-10);
+  --fg-muted: var(--dusk-30);
+  --fg-brand: var(--yellow);
+  --border: var(--dusk);
+  --stroke-divider: var(--dusk-50);
+
+  font-family: var(--primary-font);
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: var(--fg-body);
+  background-color: var(--bg-default);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -43,46 +102,39 @@ body {
 
 a {
   font-weight: 500;
-  color: #dcff1e;
+  color: var(--fg-brand);
   text-decoration: inherit;
 }
 a:hover {
-  color: #f1ffa5;
+  color: var(--yellow-50);
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  color: var(--fg-default);
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 5px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: var(--primary-font);
+  background-color: var(--hyper-10);
+  color: var(--base-white);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 button:hover {
-  border-color: #646cff;
+  background-color: var(--hyper-09);
+  border-color: var(--hyper-06);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid var(--fg-brand);
+  outline-offset: 2px;
 }
-
-/*@media (prefers-color-scheme: light) {*/
-/*  :root {*/
-/*    color: #213547;*/
-/*    background-color: #ffffff;*/
-/*  }*/
-/*  a:hover {*/
-/*    color: #747bff;*/
-/*  }*/
-/*  button {*/
-/*    background-color: #f9f9f9;*/
-/*  }*/
-/*}*/

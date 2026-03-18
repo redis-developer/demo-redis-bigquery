@@ -1,10 +1,11 @@
 .navbar {
-  background-color: #163341;
+  background-color: var(--dusk);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--dusk-90);
 }
 
 .navbar-brand {
@@ -14,28 +15,35 @@
 
 .navbar-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .timer {
-  color: #fff;
+  color: var(--fg-default);
 }
 
 .nav-button {
-  color: #fff;
-  border: 1px solid #dcff1e;
-  border-radius: 2px;
+  color: var(--base-white);
+  background-color: var(--dusk);
+  border: 1px solid var(--dusk-90);
+  border-radius: 5px;
+}
+
+.nav-button:hover {
+  background-color: var(--dusk-90);
 }
 
 .nav-link {
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 5px;
   transition: background-color 0.2s;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--dusk-90);
 }
 
 @media (max-width: 768px) {

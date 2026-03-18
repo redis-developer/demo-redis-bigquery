@@ -8,7 +8,7 @@
   padding: 0.25rem;
   width: 2rem;
   height: 2rem;
-  color: #dcff1e;
+  color: var(--fg-brand);
   background-color: transparent;
   overflow: hidden;
   vertical-align: middle;

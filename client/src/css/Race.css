@@ -8,14 +8,14 @@ input[type="number"] {
 }
 
 input:invalid {
-  border: 1px solid #ff4438;
+  border: 1px solid var(--hyper-05);
 }
 
 .race {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #1a1a1a;
+  background-color: var(--dusk-09);
   transition: transform 0.2s;
   height: 90%;
   display: flex;
@@ -43,7 +43,7 @@ input:invalid {
 }
 
 .race-img {
-  background-color: #163341;
+  background-color: var(--dusk);
 }
 
 .race-overlay {
@@ -73,7 +73,7 @@ input:invalid {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  color: white;
+  color: var(--base-white);
   font-size: 1.5rem;
   padding: 0.5rem;
   background-color: rgba(0, 0, 0, 0.5);
@@ -91,12 +91,12 @@ input:invalid {
 }
 
 .bookmark-btn.active {
-  color: #dcff1e;
+  color: var(--fg-brand);
 }
 
 .rating-select {
   background-color: rgba(0, 0, 0, 0.7);
-  color: white;
+  color: var(--base-white);
   border: none;
   padding: 0.5rem;
   border-radius: 4px;
@@ -118,13 +118,13 @@ input:invalid {
 }
 
 .race-info p {
-  color: #999;
-  font-size: 0.9rem;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
 }
 
 .user-rating {
-  color: #ffd700;
-  font-size: 0.9rem;
+  color: var(--yellow);
+  font-size: 0.875rem;
   margin-top: auto;
 }
 
