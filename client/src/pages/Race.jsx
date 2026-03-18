@@ -29,7 +29,7 @@ function Race() {
                 <br />
                 {race.circuit_location}, {race.circuit_country}
                 <br />
-                {race.date.value}
+                {race.date?.value ?? race.date}
               </h3>
             </div>
             <div className="driver-grid">

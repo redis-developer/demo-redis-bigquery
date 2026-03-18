@@ -1,14 +1,15 @@
-name: "demo-redis-biquery"
+name: "demo-redis-bigquery"
 services:
   redis:
     container_name: demo-redis-bigquery-redis
-    image: "redis:8.0-M02"
+    image: "redis:alpine"
     ports:
       - 6379:6379
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
       - redis-data:/data
 
@@ -16,17 +17,22 @@ services:
     container_name: demo-redis-bigquery-app
     build:
       context: ./
-    command: bun dev
+      target: release
     ports:
-      - "${PORT-8080}:${PORT-8080}"
+      - "${PORT:-8080}:${PORT:-8080}"
     environment:
-      PORT: ${PORT-8080}
+      ENABLE_IMAGE_ENRICHMENT: ${ENABLE_IMAGE_ENRICHMENT:-false}
+      NODE_ENV: production
+      PORT: ${PORT:-8080}
     env_file:
-      - ./.env
-      - ./.env.docker
-    restart: always
+      - path: ./.env
+        required: false
+      - path: ./.env.docker
+        required: false
+    restart: unless-stopped
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 
 volumes:
   redis-data:

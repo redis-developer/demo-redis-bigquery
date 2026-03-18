@@ -1,85 +1,85 @@
-This demo uses Redis as a frontend cache for BigQuery. It demonstrates how to
-apply the cache prefetching strategy and use Redis for JSON storage and search.
-The app is written in Express and React with vite.
+This demo shows how to prefetch BigQuery data into Redis for fast app reads. It uses Redis JSON to store race documents and Redis Search to filter them by year.
+
+The app has two run modes:
+
+- Local dev: Vite serves the React app on `http://localhost:5173` and proxies API calls to the Express server on `http://localhost:3000`.
+- Docker: Express serves the production client build on `http://localhost:8080`.
 
 ## Requirements
 
-- [gcloud
-  credentials](https://cloud.google.com/docs/authentication/set-up-adc-local-dev-environment)
-- [BigQuery](https://cloud.google.com/bigquery) setup with the [Formula One](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020) dataset loaded
 - [bun](https://bun.sh/)
-- [docker](https://www.docker.com/)
-  - Optional
+- [docker](https://www.docker.com/) for the containerized flow
+- A BigQuery project with the [Formula One dataset](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020) loaded
+- Local Google Cloud application default credentials for the BigQuery API
 
-## Getting started
+## Configuration
 
-Copy and edit the `.env` file:
+Copy the sample environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-Your `.env` file should contain the connection string you copied from Redis Cloud. It also has the Google Cloud credentials for connecting to BigQuery.
+Update the required values:
 
-1. Copy the JSON from the generated `application_default_credentials.json` into your `.env` file using the `GOOGLE_APPLICATION_CREDENTIALS` variable
-2. Set the `GOOGLE_CLOUD_PROJECT_ID` environment variable in your `.env` file to the associated gcloud project you want to use.
+- `REDIS_URL`
+- `GOOGLE_APPLICATION_CREDENTIALS`
+- `GOOGLE_CLOUD_PROJECT_ID`
 
-Your `.env.docker` file will overwrite the REDIS_URL to use the appropriate docker internal URLs. Here is
-an example:
+Optional values:
 
-```bash
-REDIS_URL="redis://redis:6379"
-```
+- `PORT`
+- `ENABLE_IMAGE_ENRICHMENT`
 
-Next, spin up docker containers:
+`ENABLE_IMAGE_ENRICHMENT=false` disables the Wikipedia image lookups during cache warmup. That is the default in Docker to keep startup predictable.
 
-```bash
-docker compose up -d --build
-```
+## Run locally
 
-You should have a server running on `http://localhost:<port>` where the port is set in your `.env` file (default is 8080).
-
-Visit the localhost url to see your site.
-
-## Running locally outside docker
-
-To run the development server outside of docker:
+Start Redis separately, then run:
 
 ```bash
 bun install
-# then
-bun dev
+bun run dev
 ```
 
-## Other Scripts
+Open `http://localhost:5173`.
 
-Formatting code:
+## Run with Docker
+
+Create `.env` first, then run:
 
 ```bash
-bun format
+bun run docker:up
 ```
 
-## Connecting to Redis Cloud
+Open `http://localhost:8080`.
 
-If you don't yet have a database setup in Redis Cloud [get started here for free](https://redis.io/try-free/).
+The Compose file uses `redis:alpine` and runs the app from the production build.
 
-To connect to a Redis Cloud database, log into the console and find the following:
-
-1. The `public endpoint` (looks like `redis-#####.c###.us-east-1-#.ec2.redns.redis-cloud.com:#####`)
-1. Your `username` (`default` is the default username, otherwise find the one you setup)
-1. Your `password` (either setup through Data Access Control, or available in the `Security` section of the database
-   page.
-
-Combine the above values into a connection string and put it in your `.env` and `.env.docker` accordingly. It should
-look something like the following:
+## Scripts
 
 ```bash
-REDIS_URL="redis://default:<password>@redis-#####.c###.us-west-2-#.ec2.redns.redis-cloud.com:#####"
+bun run dev
+bun run build
+bun run test
+bun run lint
+bun run format
+bun run docker:up
+bun run docker:down
 ```
+
+## Redis notes
+
+- This app uses the official `redis` Node.js client.
+- Race documents are stored as Redis JSON values under the `races:*` prefix.
+- A Redis Search index named `races-idx` supports the year filter.
+
+## Redis Cloud
+
+If you want to point the app at Redis Cloud instead of local Redis, replace `REDIS_URL` in `.env` with your Redis Cloud connection string.
 
 ## Learn more
 
-To learn more about Redis, take a look at the following resources:
-
-- [Redis Documentation](https://redis.io/docs/latest/) - learn about Redis products, features, and commands.
-- [Learn Redis](https://redis.io/learn/) - read tutorials, quick starts, and how-to guides for Redis.
+- [Redis docs](https://redis.io/docs/latest/)
+- [Redis clients](https://redis.io/docs/latest/develop/clients/)
+- [Redis Insight](https://redis.io/insight/)

@@ -1,9 +1,5 @@
-node_modules/
-.env
-.env.*
-.gitignore
-compose.yml
-Dockerfile
-README.md
-build/
-dist/
+build
+client/build
+node_modules
+.git
+.DS_Store

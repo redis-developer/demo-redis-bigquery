@@ -1,6 +1,6 @@
 import { BigQuery } from "@google-cloud/bigquery";
 import { getClient } from "../../redis";
-import { SchemaFieldTypes } from "redis";
+import { SCHEMA_FIELD_TYPE } from "redis";
 import { findImageUrl } from "../../services/wikipedia";
 
 /**
@@ -43,12 +43,9 @@ import { findImageUrl } from "../../services/wikipedia";
  * @property {RaceDocument} documents
  */
 
-const bq = new BigQuery({
-  credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS),
-  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-});
 const RACES_INDEX = "races-idx";
 const RACES_PREFIX = "races:";
+let bigQueryClient = null;
 const QUERIES = {
   RACES: `SELECT
   r.raceId AS race_id,
@@ -96,6 +93,31 @@ WHERE
 ORDER BY re.raceId ASC, re.position ASC`,
 };
 
+function getBigQueryClient() {
+  if (bigQueryClient) {
+    return bigQueryClient;
+  }
+
+  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    throw new Error("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+  }
+
+  if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
+    throw new Error("GOOGLE_CLOUD_PROJECT_ID is not set.");
+  }
+
+  bigQueryClient = new BigQuery({
+    credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS),
+    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+  });
+
+  return bigQueryClient;
+}
+
+export function setBigQueryClient(client) {
+  bigQueryClient = client;
+}
+
 async function haveIndex() {
   const redis = await getClient();
   const indexes = await redis.ft._list();
@@ -105,7 +127,7 @@ async function haveIndex() {
   });
 }
 
-export async function createdIndexIfNotExists() {
+export async function createIndexIfNotExists() {
   const redis = await getClient();
 
   if (!(await haveIndex())) {
@@ -114,11 +136,11 @@ export async function createdIndexIfNotExists() {
       {
         "$.race_id": {
           AS: "race_id",
-          type: SchemaFieldTypes.NUMERIC,
+          type: SCHEMA_FIELD_TYPE.NUMERIC,
         },
         "$.year": {
           AS: "year",
-          type: SchemaFieldTypes.NUMERIC,
+          type: SCHEMA_FIELD_TYPE.NUMERIC,
         },
       },
       {
@@ -138,13 +160,25 @@ export async function dropIndex() {
 }
 
 export async function initialize() {
-  await createdIndexIfNotExists();
+  await createIndexIfNotExists();
 }
 
 export async function getRaceKeys() {
   const redis = await getClient();
+  const keys = [];
+  let cursor = "0";
 
-  return redis.keys(`${RACES_PREFIX}*`);
+  do {
+    const scanResult = await redis.scan(cursor, {
+      MATCH: `${RACES_PREFIX}*`,
+      COUNT: 100,
+    });
+
+    cursor = String(scanResult.cursor);
+    keys.push(...scanResult.keys);
+  } while (cursor !== "0");
+
+  return keys;
 }
 
 export async function delAll() {
@@ -166,46 +200,61 @@ export async function count() {
 export async function populate() {
   await delAll();
   const redis = await getClient();
-  const [races] = /** @type [Race[]] */ (await bq.query(QUERIES.RACES));
-  const [results] = /** @type [RaceResult[]] */ (
-    await bq.query(QUERIES.RESULTS)
+  const [races] = /** @type {[Race[]]} */ (
+    await getBigQueryClient().query(QUERIES.RACES)
   );
-  const circuitsUrls = {};
+  const [results] = /** @type {[RaceResult[]]} */ (
+    await getBigQueryClient().query(QUERIES.RESULTS)
+  );
+  const circuitGroups = new Map();
+  const resultsByRaceId = new Map();
 
-  for (let race of races) {
-    let imageUrls = circuitsUrls[race.circuit_url];
+  for (const result of results) {
+    const raceResults = resultsByRaceId.get(result.race_id) ?? [];
+    raceResults.push(result);
+    resultsByRaceId.set(result.race_id, raceResults);
+  }
 
-    if (!Array.isArray(imageUrls)) {
-      imageUrls = circuitsUrls[race.circuit_url] = [];
-    }
+  for (const race of races) {
+    const racesForCircuit = circuitGroups.get(race.circuit_url) ?? [];
+    racesForCircuit.push(race);
+    circuitGroups.set(race.circuit_url, racesForCircuit);
 
-    imageUrls.push(race);
-
-    race.results = results.filter((result) => result.race_id === race.race_id);
+    race.results = resultsByRaceId.get(race.race_id) ?? [];
     race.winner = race.results.find((result) => result.position === 1);
+    race.circuit_image = race.circuit_image ?? "";
   }
 
-  for (let result of results) {
-    let image = await findImageUrl(result.driver_url, "driver");
-    result.driver_image = image ?? "";
-  }
+  if (process.env.ENABLE_IMAGE_ENRICHMENT !== "false") {
+    for (const result of results) {
+      const image = await findImageUrl(result.driver_url, "driver");
+      result.driver_image = image ?? "";
+    }
 
-  for (let circuitUrl of Object.keys(circuitsUrls)) {
-    let image = await findImageUrl(circuitUrl, "circuit");
-    for (let race of circuitsUrls[circuitUrl]) {
-      race.circuit_image = image ?? "";
+    for (const [circuitUrl, racesForCircuit] of circuitGroups.entries()) {
+      const image = await findImageUrl(circuitUrl, "circuit");
+
+      for (const race of racesForCircuit) {
+        race.circuit_image = image ?? "";
+      }
+    }
+  } else {
+    for (const result of results) {
+      result.driver_image = "";
     }
   }
 
-  await redis.json.mSet(
-    races.map((race) => {
-      return {
-        key: `${RACES_PREFIX}${race.race_id}`,
-        path: "$",
-        value: race,
-      };
-    }),
-  );
+  if (races.length > 0) {
+    await redis.json.mSet(
+      races.map((race) => {
+        return {
+          key: `${RACES_PREFIX}${race.race_id}`,
+          path: "$",
+          value: race,
+        };
+      }),
+    );
+  }
 }
 
 export async function byYear(year) {

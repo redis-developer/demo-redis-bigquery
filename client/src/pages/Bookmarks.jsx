@@ -5,13 +5,13 @@ import Race from "../components/Race.jsx";
 function Bookmarks() {
   const { bookmarks } = useBookmarkContext();
 
-  if (bookmarks) {
+  if (bookmarks.length > 0) {
     return (
       <div>
         <h2 className="bookmarks">Your Bookmarks</h2>
         <div className="bookmark-grid">
           {bookmarks.map((race) => (
-            <Race race={race} key={race.id} />
+            <Race race={race} key={race.race_id} />
           ))}
         </div>
       </div>

@@ -8,32 +8,45 @@
   },
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:client": "bunx --bun vite",
+    "dev:client": "bunx --bun vite --host 0.0.0.0",
     "dev:server": "bun --watch server/index.js",
+    "build": "bunx --bun vite build --emptyOutDir --outDir ../build/client",
     "format": "prettier . --write",
-    "start": "bunx --bun vite build && bun server/index.js",
+    "start": "NODE_ENV=production bun server/index.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "bunx --bun vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down --volumes"
   },
   "dependencies": {
-    "@google-cloud/bigquery": "^7.9.3",
+    "@google-cloud/bigquery": "^8.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "jsdom": "^26.0.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.4.1",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsdom": "^29.0.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1",
     "react-tates": "^0.2.0",
-    "redis": "^4.7.0"
+    "redis": "^5.11.0",
+    "tates": "^0.3.4"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react-swc": "^3.8.1",
-    "globals": "^16.0.0",
+    "@vitejs/plugin-react-swc": "^4.3.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.5.3",
-    "vite": "^6.2.3"
+    "prettier": "^3.8.1",
+    "supertest": "^7.2.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0"
   }
 }

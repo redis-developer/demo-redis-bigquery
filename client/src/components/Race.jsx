@@ -33,7 +33,7 @@ function Race({ race }) {
         </div>
         <div className="race-info">
           <h2>{race.name}</h2>
-          <h4>{race.date.value}</h4>
+          <h4>{race.date?.value ?? race.date}</h4>
           <p>
             {race.circuit_location}, {race.circuit_country}
           </p>

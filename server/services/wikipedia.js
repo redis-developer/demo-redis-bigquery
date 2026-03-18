@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
+import { JSDOM } from "jsdom";
 
 const circuitsFilePath = path.resolve("assets/circuit_images.json");
 const driversFilePath = path.resolve("assets/driver_images.json");

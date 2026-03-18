@@ -25,7 +25,8 @@ function queryToNumber(query) {
 }
 
 function Races() {
-  const [params, setParams] = useSearchParams({ year: "2024" });
+  const currentYear = new Date().getFullYear();
+  const [params, setParams] = useSearchParams({ year: String(currentYear) });
   const queryYear = queryToNumber(params.get("year"));
   const timerRunning = notifications.useTimerRunning();
   const races = hooks.useRacesByYear({
@@ -40,7 +41,8 @@ function Races() {
       return;
     }
 
-    const search = e.target.search.value;
+    const formData = new FormData(e.currentTarget);
+    const search = formData.get("search");
     const year = queryToNumber(search);
 
     if (year) {
@@ -57,9 +59,9 @@ function Races() {
           type="number"
           placeholder="Search for race year"
           name="search"
-          defaultValue={2024}
+          defaultValue={currentYear}
           min={1950}
-          max={2024}
+          max={currentYear}
         />
         <button className="search-btn" type="submit">
           Search

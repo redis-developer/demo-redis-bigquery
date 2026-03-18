@@ -5,6 +5,7 @@ if (!process.env.REDIS_URL) {
 }
 
 let client = null;
+let clientPromise = null;
 
 /**
  * @param {import("redis").RedisClientOptions} [options]
@@ -12,35 +13,38 @@ let client = null;
  * @returns {Promise<ReturnType<typeof createClient>>}
  */
 export async function getClient(options) {
-  options = Object.assign(
-    {},
-    {
-      url: process.env.REDIS_URL,
-    },
+  const resolvedOptions = Object.assign(
+    { url: process.env.REDIS_URL },
     options,
   );
 
-  if (client && client.options?.url === options.url) {
+  if (client?.isOpen && client.options?.url === resolvedOptions.url) {
     return client;
   }
 
-  client = createClient(options);
-
-  client
-    .on("error", (err) => {
-      console.error("Redis Client Error", err);
-      void refreshClient();
-    })
-    .connect();
-
-  return client;
-}
-
-async function refreshClient() {
-  if (client) {
-    await client.disconnect();
-    client = null;
+  if (clientPromise && client?.options?.url === resolvedOptions.url) {
+    return clientPromise;
   }
 
-  client = await getClient();
+  client = createClient(resolvedOptions);
+  client.on("error", (err) => {
+    console.error("Redis client error", err);
+  });
+
+  clientPromise = client.connect().then(() => client);
+
+  return clientPromise;
+}
+
+export async function closeClient() {
+  if (client) {
+    if (client.isOpen) {
+      await client.quit();
+    } else {
+      client.disconnect();
+    }
+  }
+
+  client = null;
+  clientPromise = null;
 }

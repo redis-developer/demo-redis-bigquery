@@ -42,8 +42,9 @@ export const actions = {
    */
   handleError(e) {
     console.error(e);
-    let errorMessage = "Unknown error ocurred";
-    if (utils.isErrorLike(e)) {
+    let errorMessage = "Unknown error occurred";
+
+    if (e instanceof Error) {
       errorMessage = e.message;
     }
 
@@ -60,7 +61,7 @@ export const actions = {
 export const hooks = {
   useNotification: createStateHook({
     tate,
-    property: "notifcation",
+    property: "notification",
     initialValue: /** @type {Notification | null} */ (null),
   }),
 
@@ -73,6 +74,6 @@ export const hooks = {
   useTimerRunning: createStateHook({
     tate,
     property: "timerRunning",
-    initialValue: 0,
+    initialValue: false,
   }),
 };
